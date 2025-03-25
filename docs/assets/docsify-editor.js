@@ -1,5 +1,7 @@
 let easyMDE = null;
 let isEditing = false;
+var num = 0;
+
 
 function getCurrentPageFileName() {
   var fileName = window.location.hash.split('/').pop().replace('.md', '');
@@ -28,7 +30,7 @@ function saveData(reload = false) {
         // Revert back to the original page style after save
         document.body.style.backgroundColor = ''; // Reset to original background color
         document.body.style.color = '';           // Reset text color
-        if(reload) {
+        if (reload) {
           window.location.reload();
         }
       } else {
@@ -74,7 +76,7 @@ function editPage() {
         },
         className: "fa fa-save",
         title: "Save Document"
-      },{
+      }, {
         name: "saveClose",
         action: function () {
           saveData(true);
@@ -117,7 +119,23 @@ function initDocsify() {
     loadNavbar: true,
     basePath: '/',
     loadSidebar: false,
+    markdown: {
+      renderer: {
+        code: function (code, lang) {
+          var html = '<div class="mermaid2">' + code + '</div>';
+          return html;
+        }
+      }
+    },
     plugins: [
+      function processMermaid (hook, vm) {
+        hook.ready(function () {
+          mermaid.initialize({ startOnLoad: false });
+        });
+        hook.doneEach(function () {
+          mermaid.init(undefined, '.mermaid2');
+        });
+      },
       function editButton(hook, vm) {
         hook.beforeEach(function (html) {
           var editHtml = '<a id="editButton" style="cursor: pointer; text-decoration:underline;">📝 Edit Document</a>\n\n';
