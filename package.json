@@ -1,0 +1,20 @@
+{
+  "name": "docsify-editor",
+  "version": "1.0.0",
+  "description": "Docsify Editor is a simple web-based Markdown editor built with Docsify and EasyMDE, supporting real-time preview and optional server-side storage.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0"
+  }
+}
