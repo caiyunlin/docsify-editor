@@ -9,6 +9,15 @@ function getCurrentPageFileName() {
   return fileName === '' ? 'README' : fileName;
 }
 
+function loadMermaid(id, code) {
+  console.log("Loading Mermaid code:", code);
+  let container = document.getElementById(id);
+  if (container) {
+    container.innerHTML = `<div class="mermaid">${code}</div>`;
+    mermaid.init(undefined, ".mermaid");
+  }
+}
+
 function saveData(reload = false) {
   var filename = getCurrentPageFileName();
 
@@ -86,8 +95,22 @@ function editPage() {
       }
     ],
     previewRender: function (plainText) {
-      const html = marked.parse(plainText);
-      setTimeout(() => mermaid.init(undefined, document.querySelectorAll(".mermaid")), 100);
+      // use marked to render markdown
+      let html = marked.parse(plainText);
+    
+      // replace the mermaid code blocks with placeholders to avoid keep re-rendering
+      html = html.replace(/<div class="mermaid">([\s\S]*?)<\/div>/g, (match, code) => {
+        let id = "mermaid-" + Math.random().toString(36).substr(2, 9);
+        return `
+          <div id="${id}" class="mermaid-placeholder">
+            <button class="mermaid-load-btn" onclick="loadMermaid('${id}', decodeURIComponent('${encodeURIComponent(code)}'))">
+              Click to load Mermaid diagram
+            </button>
+            <br/>
+          </div>
+        `;
+      });
+    
       return html;
     }
   });
@@ -105,8 +128,7 @@ function editPage() {
   // Bind the change event to update the preview
   easyMDE.codemirror.on("change", () => {
     const markdown = easyMDE.value();
-    document.getElementById("preview").innerHTML = marked.parse(markdown);
-    setTimeout(() => mermaid.init(undefined, document.querySelectorAll(".mermaid")), 100);
+    //setTimeout(() => mermaid.init(undefined, document.querySelectorAll(".mermaid")), 100);
   });
 
 
@@ -122,8 +144,11 @@ function initDocsify() {
     markdown: {
       renderer: {
         code: function (code, lang) {
-          var html = '<div class="mermaid2">' + code + '</div>';
-          return html;
+          if(lang=="mermaid"){
+            var html = '<div class="mermaid">' + code + '</div>';
+            return html;
+          }
+          return this.origin.code.apply(this, arguments);
         }
       }
     },
@@ -133,7 +158,7 @@ function initDocsify() {
           mermaid.initialize({ startOnLoad: false });
         });
         hook.doneEach(function () {
-          mermaid.init(undefined, '.mermaid2');
+          mermaid.init(undefined, '.mermaid');
         });
       },
       function editButton(hook, vm) {
@@ -154,14 +179,10 @@ function initDocsify() {
 }
 
 function initEasyMDE() {
-
-  const editorContainer = document.getElementById('editorContainer');
   const editButton = document.getElementById('editButton');
-
   editButton.addEventListener('click', () => {
     editPage();
   });
-
 }
 
 // Function to bind keyboard events (Ctrl+S, ESC, E)
