@@ -1,6 +1,7 @@
 # 📖 Docsify Editor
 🚀 **Docsify Editor**  is a simple web-based Markdown editor built with Docsify and EasyMDE, supporting real-time preview and optional server-side storage.
 
+![](/uploads/20250328095506256.png)
 
 ```mermaid
 graph LR;

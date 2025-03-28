@@ -97,7 +97,7 @@ function editPage() {
     previewRender: function (plainText) {
       // use marked to render markdown
       let html = marked.parse(plainText);
-    
+
       // replace the mermaid code blocks with placeholders to avoid keep re-rendering
       html = html.replace(/<div class="mermaid">([\s\S]*?)<\/div>/g, (match, code) => {
         let id = "mermaid-" + Math.random().toString(36).substr(2, 9);
@@ -110,8 +110,25 @@ function editPage() {
           </div>
         `;
       });
-    
       return html;
+    },
+    uploadImage: true,
+    imageUploadFunction: (file, onSuccess, onError) => {
+      const formData = new FormData();
+      formData.append('image', file);
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.url) {
+            onSuccess(data.url);
+          } else {
+            onError('Upload failed');
+          }
+        })
+        .catch(() => onError('Upload failed'))
     }
   });
 
@@ -144,7 +161,7 @@ function initDocsify() {
     markdown: {
       renderer: {
         code: function (code, lang) {
-          if(lang=="mermaid"){
+          if (lang == "mermaid") {
             var html = '<div class="mermaid">' + code + '</div>';
             return html;
           }
@@ -153,7 +170,7 @@ function initDocsify() {
       }
     },
     plugins: [
-      function processMermaid (hook, vm) {
+      function processMermaid(hook, vm) {
         hook.ready(function () {
           mermaid.initialize({ startOnLoad: false });
         });

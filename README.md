@@ -17,4 +17,8 @@ docker run --rm -p 8300:3000 cylin2000/docsify-editor:v1
 docker run --rm -p 8300:3000 -v C:\work\github\mywork\wiki\Topics:/var/www/docs cylin2000/docsify-editor:v1
 
 docker push cylin2000/docsify-editor:v1
+
+
+docker run -dp 3000:3000 -v /root/work/mywork/wiki/Topics:/var/www/docs ghcr.io/caiyunlin/docsify-editor:v1
+
 ```
