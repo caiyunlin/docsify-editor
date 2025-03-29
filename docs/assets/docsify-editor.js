@@ -203,14 +203,15 @@ function initDocsify() {
       },
       function editButton(hook, vm) {
         hook.beforeEach(function (html) {
-          var editHtml = '<a id="editButton" style="cursor: pointer; text-decoration:underline;">📝 Edit Document</a> <a id="deleteButton" style="cursor: pointer; text-decoration:underline; margin-left: 10px;">🗑️ Delete Document</a><br/>\n\n';
+          var editHtml = '<a id="backButton" style="cursor: pointer; margin-left: 10px;">🔙 Back</a> &nbsp;&nbsp;<a id="editButton" style="cursor: pointer; ">📝 Edit </a> <a id="deleteButton" style="cursor: pointer; margin-left: 10px;">🗑️ Delete </a>\n\n';
           return (
             editHtml + html
           );
         });
 
         hook.doneEach(function () {
-          const editButton = document.getElementById('editButton');
+
+          var editButton = document.getElementById('editButton');
           editButton.addEventListener('click', () => {
             editPage();
           });
@@ -222,6 +223,13 @@ function initDocsify() {
               if (confirmDelete) {
                 deleteDocument(vm.route.path);
               }
+            });
+          }
+
+          var backButton = document.getElementById("backButton");
+          if (backButton) {
+            backButton.addEventListener("click", function () {
+              window.history.back(); 
             });
           }
         });
