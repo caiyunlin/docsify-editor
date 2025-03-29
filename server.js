@@ -15,13 +15,13 @@ function formatTimestamp(str) {
   if (str) {
     now = new Date(str);
   }
-  return now.getFullYear() +
-    String(now.getMonth() + 1).padStart(2, '0') +
-    String(now.getDate()).padStart(2, '0') +
-    String(now.getHours()).padStart(2, '0') +
-    String(now.getMinutes()).padStart(2, '0') +
-    String(now.getSeconds()).padStart(2, '0') +
-    String(now.getMilliseconds()).padStart(3, '0');
+  return now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, '0') + "-" +
+    String(now.getDate()).padStart(2, '0') + " " +
+    String(now.getHours()).padStart(2, '0') + ":" +
+    String(now.getMinutes()).padStart(2, '0') + ":" +
+    String(now.getSeconds()).padStart(2, '0') ;
+    //String(now.getMilliseconds()).padStart(3, '0');
 }
 
 // Set up middleware to parse request bodies and log requests
@@ -60,7 +60,7 @@ const storage = multer.diskStorage({
     cb(null, docsPath + '/uploads/');
   },
   filename: (req, file, cb) => {
-    const timestamp = formatTimestamp();
+    const timestamp = formatTimestamp().replace(/:/g, '').replace(/ /g, '').replace(/-/g, '');
     cb(null, `${timestamp}.png`);
   }
 });
@@ -90,12 +90,14 @@ app.get('/filelist.md', (req, res) => {
     }
     const markdownFiles = files.filter(file => file.endsWith('.md'));
     // output markdown table format with predefined columns
-    let markdown = `| File Name | Description | Size | Last Modified | \n`;
+    let markdown = `| No. | File Name | Size | Last Modified | \n`;
     markdown += `| --- | --- | --- | --- | \n`;
+    var num = 0;
     filelist = markdownFiles.map(file => {
+      num++;
       const stats = fs.statSync(path.join(directoryPath, file));
       const formattedDate = formatTimestamp(stats.mtime);
-      return `| [${file}](${file}) |  | ${stats.size} | ${formattedDate} |`;
+      return `| ${num} | [${file}](${file})  | ${stats.size} | ${formattedDate} |`;
     });
     markdown += filelist.join('\n');
     res.setHeader('Content-Type', 'text/markdown');

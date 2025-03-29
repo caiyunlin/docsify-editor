@@ -83,13 +83,26 @@ function editPage() {
         },
         className: "fa fa-save",
         title: "Save Document"
-      }, {
-        name: "saveClose",
-        action: function () {
-          saveData(true);
+      },
+      {
+        name: "back",
+        action: function customBackFunction(editor) {
+          window.location.reload();
         },
-        className: "fa fa-floppy-o",
-        title: "Save and Return"
+        className: "fa fa-reply", // FontAwesome 图标
+        title: "Return"
+      },
+      "|",
+      {
+        name: "delete",
+        action: function customDeleteFunction(editor) {
+          var confirmDelete = confirm("Are you sure you want to delete this document?");
+          if (confirmDelete) {
+            deleteDocument(getCurrentPageFileName());
+          }
+        },
+        className: "fa fa-trash",
+        title: "Delete Document"
       }
     ],
     previewRender: function (plainText) {
@@ -203,7 +216,7 @@ function initDocsify() {
       },
       function editButton(hook, vm) {
         hook.beforeEach(function (html) {
-          var editHtml = '<a id="backButton" style="cursor: pointer; margin-left: 10px;">🔙 Back</a> &nbsp;&nbsp;<a id="editButton" style="cursor: pointer; ">📝 Edit </a> <a id="deleteButton" style="cursor: pointer; margin-left: 10px;">🗑️ Delete </a>\n\n';
+          var editHtml = '<a id="homeButton" style="cursor: pointer; margin-left: 10px;">🏠 Home</a> &nbsp;&nbsp;<a id="editButton" style="cursor: pointer; ">📝 Edit </a> <a id="deleteButton" style="cursor: pointer; margin-left: 10px;">🗑️ Delete </a>\n\n';
           return (
             editHtml + html
           );
@@ -226,10 +239,10 @@ function initDocsify() {
             });
           }
 
-          var backButton = document.getElementById("backButton");
-          if (backButton) {
-            backButton.addEventListener("click", function () {
-              window.history.back(); 
+          var homeButton = document.getElementById("homeButton");
+          if (homeButton) {
+            homeButton.addEventListener("click", function () {
+              window.location.href = '/';
             });
           }
         });
@@ -263,8 +276,4 @@ function bindKeyEvents() {
 document.addEventListener('DOMContentLoaded', function () {
   initDocsify();
   bindKeyEvents();
-});
-
-document.addEventListener('dblclick', function (event) {
-  editPage();
 });
