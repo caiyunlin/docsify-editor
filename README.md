@@ -2,23 +2,24 @@
 Docsify Editor is a simple web-based Markdown editor built with Docsify and EasyMDE, supporting real-time preview and optional server-side storage.
 
 
-## Start
-```javescript
+## Node Start
+Clone this repository and run below command
+
+```bash
 npm install
 npm start
 ```
 
-## Docker
-```
-docker build -t cylin2000/docsify-editor:v1 ./
+Update index.html & markdown files based on your requirements. 
 
-docker run --rm -p 8300:3000 cylin2000/docsify-editor:v1
+## Docker Start
+```bash
+# start default docker
+docker run -dp 3000:3000 cylin2000/docsify-editor:v1
 
-docker run --rm -p 8300:3000 -v C:\work\github\mywork\wiki\Topics:/var/www/docs cylin2000/docsify-editor:v1
+# start docker and map windows path
+docker run -dp 3000:3000 -v C:\work\mydocs:/var/www/docs cylin2000/docsify-editor:v1
 
-docker push cylin2000/docsify-editor:v1
-
-
-docker run -dp 3000:3000 -v /root/work/mywork/wiki/Topics:/var/www/docs ghcr.io/caiyunlin/docsify-editor:v1
-
+# start docker and map linux path
+docker run -dp 3000:3000 -v /var/mydocs:/var/www/docs cylin2000/docsify-editor:v1
 ```

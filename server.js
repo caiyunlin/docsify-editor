@@ -52,6 +52,8 @@ app.get('/', (req, res) => {
 });
 
 
+
+
 // 自定义存储引擎，确保文件扩展名为 .png
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -79,17 +81,14 @@ if (!fs.existsSync(docsPath + '/uploads')) {
   fs.mkdirSync(docsPath + '/uploads');
 }
 
-
-
 // list markdown files
 app.get('/filelist.md', (req, res) => {
-  const directoryPath = path.join(__dirname, 'docs');
+  const directoryPath = path.join(__dirname, docsPath);
   fs.readdir(directoryPath, function (err, files) {
     if (err) {
       return res.status(500).json({ success: false, message: 'Failed to list files' });
     }
     const markdownFiles = files.filter(file => file.endsWith('.md'));
-
     // output markdown table format with predefined columns
     let markdown = `| File Name | Description | Size | Last Modified | \n`;
     markdown += `| --- | --- | --- | --- | \n`;
@@ -99,9 +98,21 @@ app.get('/filelist.md', (req, res) => {
       return `| [${file}](${file}) |  | ${stats.size} | ${formattedDate} |`;
     });
     markdown += filelist.join('\n');
-
     res.setHeader('Content-Type', 'text/markdown');
     res.send(markdown);
+  });
+});
+
+app.post('/delete', (req, res) => {
+  const { path: filePath } = req.body;
+  const fullPath = path.join(__dirname, docsPath, filePath + ".md");
+  fs.unlink(fullPath, (err) => {
+    if (err) {
+      console.error('Error deleting file:', err);
+      return res.status(500).json({ success: false, message: 'Failed to delete file' });
+    }
+    console.log(`File deleted: ${fullPath}`);
+    res.json({ success: true });
   });
 });
 

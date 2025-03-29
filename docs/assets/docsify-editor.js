@@ -1,7 +1,5 @@
 let easyMDE = null;
 let isEditing = false;
-var num = 0;
-
 
 function getCurrentPageFileName() {
   var fileName = window.location.hash.split('/').pop().replace('.md', '');
@@ -138,7 +136,9 @@ function editPage() {
   // Load the current page content
   var currentPage = getCurrentPageFileName();
   fetch(`${currentPage}.md`)
-    .then(response => response.text())
+    .then(res => {
+      return res.ok ? res.text() : "# " + currentPage;
+    })
     .then(data => easyMDE.value(data))
     .catch(err => console.error('Load Error', err));
 
@@ -149,6 +149,29 @@ function editPage() {
   });
 
 
+}
+
+function deleteDocument(filePath) {
+  fetch('/delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ path: filePath }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Document deleted successfully!');
+        window.location.href = '/'; // 删除成功后重定向到首页或其他页面
+      } else {
+        alert('Failed to delete document.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while deleting the document.');
+    });
 }
 
 function initDocsify() {
@@ -180,26 +203,31 @@ function initDocsify() {
       },
       function editButton(hook, vm) {
         hook.beforeEach(function (html) {
-          var editHtml = '<a id="editButton" style="cursor: pointer; text-decoration:underline;">📝 Edit Document</a>\n\n';
-          //var editHtml = "";
+          var editHtml = '<a id="editButton" style="cursor: pointer; text-decoration:underline;">📝 Edit Document</a> <a id="deleteButton" style="cursor: pointer; text-decoration:underline; margin-left: 10px;">🗑️ Delete Document</a><br/>\n\n';
           return (
             editHtml + html
           );
         });
 
-        hook.ready(function () {
-          initEasyMDE();
+        hook.doneEach(function () {
+          const editButton = document.getElementById('editButton');
+          editButton.addEventListener('click', () => {
+            editPage();
+          });
+
+          var deleteButton = document.getElementById("deleteButton");
+          if (deleteButton) {
+            deleteButton.addEventListener("click", function () {
+              var confirmDelete = confirm("Are you sure you want to delete this document?");
+              if (confirmDelete) {
+                deleteDocument(vm.route.path);
+              }
+            });
+          }
         });
       },
     ]
   };
-}
-
-function initEasyMDE() {
-  const editButton = document.getElementById('editButton');
-  editButton.addEventListener('click', () => {
-    editPage();
-  });
 }
 
 // Function to bind keyboard events (Ctrl+S, ESC, E)
