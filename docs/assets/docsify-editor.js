@@ -191,9 +191,15 @@ function initDocsify() {
 
   window.$docsify = {
     name: 'Docsify Editor',
-    loadNavbar: true,
     basePath: '/',
+    loadNavbar: true,
     loadSidebar: false,
+    subMaxLevel: 2,
+    requestHeaders: {
+      //no need use cache for *.md
+      'cache-control': 'max-age=0',
+    },
+    auto2top: true,
     markdown: {
       renderer: {
         code: function (code, lang) {
@@ -247,6 +253,17 @@ function initDocsify() {
           }
         });
       },
+      function updateTitle(hook, vm) {
+
+        hook.doneEach(function () {
+          var title = vm.route.file.replace('.md', '');
+          if (title === '') {
+            title = 'README';
+          }
+          document.title = title + ' - ' + window.$docsify.name;
+        }
+        );
+      }
     ]
   };
 }
@@ -274,6 +291,7 @@ function bindKeyEvents() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  initDocsify();
   bindKeyEvents();
 });
+
+initDocsify();
