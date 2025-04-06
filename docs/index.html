@@ -7,21 +7,6 @@
   <link rel="stylesheet" href="assets/docsify/css/vue.css" />
   <link rel="stylesheet" href="assets/easymde/css/easymde.min.css" />
   <link rel="stylesheet" href="assets/docsify-editor/css/style.css" />
-  <!-- 样式美化 -->
-<style>
-  .metadata-block {
-    background: #f9f9f9;
-    padding: 1em;
-    margin-bottom: 1.5em;
-    border-left: 4px solid #42b983;
-    font-family: monospace;
-    white-space: pre-wrap;
-    line-height: 1.6;
-  }
-  .metadata-block strong {
-    color: #333;
-  }
-  </style>
 </head>
 
 <body>
@@ -32,41 +17,8 @@
   <script src="assets/mermaid/mermaid.min.js"></script>
   <script src="assets/docsify/js/docsify.min.js"></script>
   <script src="assets/easymde/js/easymde.min.js"></script>
-  <!-- js-yaml 解析 YAML -->
-<script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script src="assets/js-yaml/4.1.0/js-yaml.min.js"></script>
   <script src="assets/docsify-editor/js/docsify-editor.js"></script>
-
-  <script>
-    window.$docsify = window.$docsify || {};
-  
-    // 插件注册
-    window.$docsify.plugins = [].concat(function (hook, vm) {
-      hook.beforeEach(function (markdown) {
-        const match = markdown.match(/^---\n([\s\S]*?)\n---\n?/);
-        if (!match) return markdown;
-  
-        let html = '';
-        try {
-          const parsed = jsyaml.load(match[1]);
-          html = Object.entries(parsed)
-            .map(([key, val]) => {
-              if (Array.isArray(val)) {
-                return `<div><strong>${key}</strong>: ${val.join(', ')}</div>`;
-              } else {
-                return `<div><strong>${key}</strong>: ${String(val).replace(/\n/g, '<br>')}</div>`;
-              }
-            })
-            .join('');
-        } catch (e) {
-          html = `<pre>${match[1]}</pre>`;
-        }
-  
-        // 包裹在 metadata 样式块中
-        const metaBlock = `<div class="metadata-block">${html}</div>`;
-        return metaBlock + '\n\n' + markdown.replace(match[0], '');
-      });
-    }, window.$docsify.plugins || []);
-  </script>
 
 </body>
 

@@ -1,3 +1,4 @@
+/*reset code mirror editing mode*/
 .cm-s-easymde .cm-header,
 .cm-s-easymde .cm-header-1,
 .cm-s-easymde .cm-header-2,
@@ -22,4 +23,19 @@
 .cm-s-easymde .cm-inline-code,
 .cm-s-easymde .cm-code {
   all: unset;
+}
+
+/* add markdown metadata style*/
+.metadata-block {
+  background: #f9f9f9;
+  padding: 1em;
+  margin-bottom: 1.5em;
+  border-left: 4px solid #42b983;
+  font-family: monospace;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.metadata-block strong {
+  color: #333;
 }

@@ -76,7 +76,7 @@ function processMetadata(markdownText) {
     }
     markdownText = markdownText.replace(metaMatch[0], "");
   }
-  return html + markdownText;
+  return html + "\n" + markdownText;
 }
 
 function editPage() {
@@ -298,6 +298,35 @@ function initDocsify() {
   };
 }
 
+function initMetadataHandler(){
+  window.$docsify = window.$docsify || {};
+  window.$docsify.plugins = [].concat(function (hook, vm) {
+    hook.beforeEach(function (markdown) {
+      const match = markdown.match(/^---\n([\s\S]*?)\n---\n?/);
+      if (!match) return markdown;
+
+      let html = '';
+      try {
+        const parsed = jsyaml.load(match[1]);
+        html = Object.entries(parsed)
+          .map(([key, val]) => {
+            if (Array.isArray(val)) {
+              return `<div><strong>${key}</strong>: ${val.join(', ')}</div>`;
+            } else {
+              return `<div><strong>${key}</strong>: ${String(val).replace(/\n/g, '<br>')}</div>`;
+            }
+          })
+          .join('');
+      } catch (e) {
+        html = `<pre>${match[1]}</pre>`;
+      }
+      const metaBlock = `<div class="metadata-block">${html}</div>`;
+      return metaBlock + '\n\n' + markdown.replace(match[0], '');
+    });
+  }, window.$docsify.plugins || []);
+}
+
+
 // Function to bind keyboard events (Ctrl+S, ESC, E)
 function bindKeyEvents() {
   document.addEventListener('keydown', function (event) {
@@ -325,3 +354,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 initDocsify();
+initMetadataHandler();
