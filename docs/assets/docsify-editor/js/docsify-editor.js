@@ -53,6 +53,32 @@ function saveData(reload = false) {
     });
 }
 
+function processMetadata(markdownText) {
+  const metaMatch = markdownText.match(/^---\n([\s\S]*?)\n---\n?/);
+  let html = "";
+  if (metaMatch) {
+    const rawMeta = metaMatch[1];
+    try {
+      const parsedMeta = jsyaml.load(rawMeta);
+      const metaHtml = Object.entries(parsedMeta)
+        .map(([key, value]) => {
+          if (Array.isArray(value)) {
+            return `<strong>${key}</strong>: ${value.join(", ")}`;
+          } else {
+            return `<strong>${key}</strong>: ${String(value).replace(/\n/g, "<br>")}`;
+          }
+        })
+        .join("<br>");
+      html += `<div class="metadata-block">${metaHtml}</div>`;
+    } catch (e) {
+      console.error("Metadata parsing error:", e);
+      html += `<div class="metadata-block"><strong>Metadata 解析失败：</strong><br><pre>${rawMeta}</pre></div>`;
+    }
+    markdownText = markdownText.replace(metaMatch[0], "");
+  }
+  return html + markdownText;
+}
+
 function editPage() {
   if (isEditing) {
     return;
@@ -106,9 +132,12 @@ function editPage() {
       }
     ],
     previewRender: function (plainText) {
+      let html = plainText;
+      console.log("Markdown content 1:", html);
+      html = processMetadata(html);
+      console.log("Markdown content 2:", html);
       // use marked to render markdown
-      let html = marked.parse(plainText);
-
+      html = marked.parse(html);
       // replace the mermaid code blocks with placeholders to avoid keep re-rendering
       html = html.replace(/<div class="mermaid">([\s\S]*?)<\/div>/g, (match, code) => {
         let id = "mermaid-" + Math.random().toString(36).substr(2, 9);
@@ -121,11 +150,11 @@ function editPage() {
           </div>
         `;
       });
+
+      // 
+
+
       return html;
-    },
-    renderingConfig: {
-      singleLineBreaks: false,
-      codeSyntaxHighlighting: false,
     },
     uploadImage: true,
     imageUploadFunction: (file, onSuccess, onError) => {
@@ -192,7 +221,6 @@ function deleteDocument(filePath) {
 }
 
 function initDocsify() {
-
   window.$docsify = {
     name: 'Docsify Editor',
     basePath: '/',
@@ -200,8 +228,7 @@ function initDocsify() {
     loadSidebar: false,
     subMaxLevel: 2,
     requestHeaders: {
-      //no need use cache for *.md
-      'cache-control': 'max-age=0',
+      'cache-control': 'max-age=0',//no need use cache for *.md
     },
     auto2top: true,
     markdown: {
@@ -258,15 +285,14 @@ function initDocsify() {
         });
       },
       function updateTitle(hook, vm) {
-
         hook.doneEach(function () {
           var title = vm.route.file.replace('.md', '');
           if (title === '') {
             title = 'README';
           }
+          title = decodeURIComponent(title);
           document.title = title + ' - ' + window.$docsify.name;
-        }
-        );
+        });
       }
     ]
   };

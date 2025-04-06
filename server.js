@@ -46,7 +46,8 @@ app.get('/', (req, res) => {
 
 // Handle saving Markdown content
 app.post('/save', (req, res) => {
-  const { filename, content } = req.body;
+  let { filename, content } = req.body;
+  filename = decodeURIComponent(filename);
   const filePath = path.join(docsPath, `${filename}.md`);
 
   // Write the new content to the file
@@ -78,7 +79,8 @@ app.post('/upload', upload.single('image'), (req, res) => {
 });
 
 app.post('/delete', (req, res) => {
-  const { path: filePath } = req.body;
+  let { path: filePath } = req.body;
+  filePath = decodeURIComponent(filePath);
   const fullPath = path.join(docsPath, filePath + ".md");
   fs.unlink(fullPath, (err) => {
     if (err) {
