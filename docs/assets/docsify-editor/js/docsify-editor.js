@@ -123,6 +123,10 @@ function editPage() {
       });
       return html;
     },
+    renderingConfig: {
+      singleLineBreaks: false,
+      codeSyntaxHighlighting: false,
+    },
     uploadImage: true,
     imageUploadFunction: (file, onSuccess, onError) => {
       const formData = new FormData();

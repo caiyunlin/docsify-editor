@@ -1,0 +1,25 @@
+.cm-s-easymde .cm-header,
+.cm-s-easymde .cm-header-1,
+.cm-s-easymde .cm-header-2,
+.cm-s-easymde .cm-header-3,
+.cm-s-easymde .cm-strong,
+.cm-s-easymde .cm-em,
+.cm-s-easymde .cm-inline-code {
+  font-weight: normal !important;
+  font-style: normal !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  background: none !important;
+  text-decoration: none !important;
+}
+.cm-s-easymde {
+  font-family: monospace;
+  font-size: 14px;
+}
+.cm-s-easymde .cm-formatting,
+.cm-s-easymde .cm-formatting-code-block,
+.cm-s-easymde .cm-comment,
+.cm-s-easymde .cm-inline-code,
+.cm-s-easymde .cm-code {
+  all: unset;
+}
