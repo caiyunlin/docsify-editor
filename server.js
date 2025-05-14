@@ -1,12 +1,14 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const multer = require('multer');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const PASSWORD = process.env.LOGIN_PASSWORD || 'docsify';
 let docsPath = process.env.DOCS_PATH || "docs";
 
 function formatTimestamp(str) {
@@ -22,6 +24,45 @@ function formatTimestamp(str) {
     String(now.getSeconds()).padStart(2, '0');
 }
 
+
+// Middleware to check for password
+function authMiddleware(req, res, next) {
+  const pwd = req.cookies.auth;
+  if (pwd === PASSWORD) {
+    return next();
+  }
+  res.redirect('/login');
+}
+
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.get('/login', (req, res) => {
+  res.send(`
+    <form method="POST" action="/login">
+      <input type="password" name="password" placeholder="Enter password" />
+      <button type="submit">Login</button>
+    </form>
+  `);
+});
+
+app.post('/login', (req, res) => {
+  const { password } = req.body;
+  if (password === PASSWORD) {
+    res.cookie('auth', password, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 365  // 365 天（单位是毫秒）
+    });
+    return res.redirect('/');
+  }
+  res.send('Password incorrect. <a href="/login">Try again</a>');
+});
+
+app.get('/logout', (req, res) => {
+  res.clearCookie('auth');
+  res.redirect('/login');
+});
+
+
 // check if docsPath a full path
 if (!path.isAbsolute(docsPath)) {
   docsPath = path.join(__dirname, docsPath);
@@ -32,15 +73,18 @@ if (!fs.existsSync(docsPath + '/uploads')) {
 }
 
 // Set up middleware to parse request bodies and log requests
+app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(morgan('dev'));
 
+// use the auth middleware for all routes
+app.use(authMiddleware);
 // Serve static files from the docs folder (to load the Markdown files)
 app.use(express.static(docsPath));
 
 // Serve the Docsify homepage (index.html) by default
-app.get('/', (req, res) => {
+app.get('/', authMiddleware, (req, res) => {
   res.sendFile(path.join(docsPath + '/', 'index.html'));
 });
 

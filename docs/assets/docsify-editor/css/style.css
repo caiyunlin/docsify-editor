@@ -39,3 +39,32 @@
 .metadata-block strong {
   color: #333;
 }
+
+/* code highlight */
+.markdown-section pre[data-lang]{
+  background-color: #2d2d2d;
+}
+.markdown-section pre code{
+  background-color: #2d2d2d;
+}
+.markdown-section pre > code{
+  color:#ccc;
+}
+.markdown-section table thead{
+  background-color: #f2f2f2;
+}
+.markdown-section tr:nth-child(2n){
+  background-color: #fafafa;
+}
+/* .markdown-section table{
+  display: table;
+}
+.markdown-section table th:first-child{
+  width: 150px;
+} */
+.markdown-section blockquote{
+  background-color: #ecf8f2;
+}
+.content pre{
+  border-radius: 10px;
+}

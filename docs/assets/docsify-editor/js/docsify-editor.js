@@ -59,7 +59,7 @@ function processMetadata(markdownText) {
   if (metaMatch) {
     const rawMeta = metaMatch[1];
     try {
-      const parsedMeta = jsyaml.load(rawMeta);
+      const parsedMeta = jsyaml.load(rawMeta,{ schema: jsyaml.FAILSAFE_SCHEMA });
       const metaHtml = Object.entries(parsedMeta)
         .map(([key, value]) => {
           if (Array.isArray(value)) {
@@ -76,7 +76,7 @@ function processMetadata(markdownText) {
     }
     markdownText = markdownText.replace(metaMatch[0], "");
   }
-  return html + "\n" + markdownText;
+  return html + "\n\n" + markdownText;
 }
 
 function editPage() {
@@ -133,9 +133,7 @@ function editPage() {
     ],
     previewRender: function (plainText) {
       let html = plainText;
-      console.log("Markdown content 1:", html);
       html = processMetadata(html);
-      console.log("Markdown content 2:", html);
       // use marked to render markdown
       html = marked.parse(html);
       // replace the mermaid code blocks with placeholders to avoid keep re-rendering
@@ -150,10 +148,6 @@ function editPage() {
           </div>
         `;
       });
-
-      // 
-
-
       return html;
     },
     uploadImage: true,
@@ -302,26 +296,7 @@ function initMetadataHandler(){
   window.$docsify = window.$docsify || {};
   window.$docsify.plugins = [].concat(function (hook, vm) {
     hook.beforeEach(function (markdown) {
-      const match = markdown.match(/^---\n([\s\S]*?)\n---\n?/);
-      if (!match) return markdown;
-
-      let html = '';
-      try {
-        const parsed = jsyaml.load(match[1]);
-        html = Object.entries(parsed)
-          .map(([key, val]) => {
-            if (Array.isArray(val)) {
-              return `<div><strong>${key}</strong>: ${val.join(', ')}</div>`;
-            } else {
-              return `<div><strong>${key}</strong>: ${String(val).replace(/\n/g, '<br>')}</div>`;
-            }
-          })
-          .join('');
-      } catch (e) {
-        html = `<pre>${match[1]}</pre>`;
-      }
-      const metaBlock = `<div class="metadata-block">${html}</div>`;
-      return metaBlock + '\n\n' + markdown.replace(match[0], '');
+      return processMetadata(markdown)
     });
   }, window.$docsify.plugins || []);
 }
@@ -343,9 +318,10 @@ function bindKeyEvents() {
 
     // Intercept E key to enter edit mode (trigger Edit button)
     if (event.key === 'e' || event.key === 'E') {
-      editPage();
+      if(!isEditing) {
+        editPage();
+      }
     }
-
   });
 }
 
