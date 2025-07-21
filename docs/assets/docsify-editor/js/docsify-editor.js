@@ -247,7 +247,8 @@ function initDocsify() {
       },
       function editButton(hook, vm) {
         hook.beforeEach(function (html) {
-          var editHtml = '<a id="homeButton" style="cursor: pointer; margin-left: 10px;">🏠 Home</a> &nbsp;&nbsp;<a id="editButton" style="cursor: pointer; ">📝 Edit </a> <a id="deleteButton" style="cursor: pointer; margin-left: 10px;">🗑️ Delete </a>\n\n';
+          //var editHtml = '<a id="homeButton" style="cursor: pointer; margin-left: 10px;">🏠 Home</a> &nbsp;&nbsp;<a id="editButton" style="cursor: pointer; ">📝 Edit </a> <a id="deleteButton" style="cursor: pointer; margin-left: 10px;">🗑️ Delete </a>\n\n';
+          var editHtml = "";
           return (
             editHtml + html
           );
