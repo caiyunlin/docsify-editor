@@ -23,3 +23,11 @@ docker run -dp 3000:3000 -v C:\work\mydocs:/var/www/docs cylin2000/docsify-edito
 # start docker and map linux path
 docker run -dp 3000:3000 -v /var/mydocs:/var/www/docs cylin2000/docsify-editor:v1
 ```
+
+## Test 
+```json table
+{
+  "abc":"test",
+  "age":123
+}
+```
